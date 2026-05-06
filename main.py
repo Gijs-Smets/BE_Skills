@@ -4,9 +4,17 @@ import config
 import database
 import queries as qr
 import award_queries as aq
+from fastapi.middleware.cors import CORSMiddleware
 
 
 app = FastAPI(docs_url=config.docs_url)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.get("/hello")
 def hello_world(message: str = "Hello World!"):
