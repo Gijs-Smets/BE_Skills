@@ -4,22 +4,36 @@ function getAchievements() {
   fetch(url)
     .then((response) => response.json())
     .then((result) => {
-      let cards = "";
+      let table = `
+        <table class="table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Title</th>
+              <th>Category</th>
+              <th>Requirement</th>
+            </tr>
+          </thead>
+          <tbody>
+      `;
 
       result.Achievements.forEach((achievement) => {
-        cards += `
-          <div class="card">
-            <div class="card-body">
-              <h5 class="card-title">${achievement.title}</h5>
-              <span class="badge">${achievement.category}</span>
-              <p class="card-text">${achievement.requirement}</p>
-              <small>ID: ${achievement.achievement_id}</small>
-            </div>
-          </div>
+        table += `
+          <tr>
+            <td>${achievement.achievement_id}</td>
+            <td>${achievement.title}</td>
+            <td>${achievement.category}</td>
+            <td>${achievement.requirement}</td>
+          </tr>
         `;
       });
 
-      document.getElementById("achievements").innerHTML = cards;
+      table += `
+          </tbody>
+        </table>
+      `;
+
+      document.getElementById("achievements").innerHTML = table;
     })
     .catch((error) => console.log("Error fetching achievements:", error));
 }
