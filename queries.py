@@ -62,3 +62,11 @@ INSERT INTO project.achievement
 (achievement_id, title, requirement, category_id)
 VALUES (%s, %s, %s, %s);
 """
+
+# all students with full name
+all_students = """
+SELECT student_id,
+       CONCAT(firstname, ' ', lastname) AS full_name
+FROM project.student
+ORDER BY student_id;
+"""

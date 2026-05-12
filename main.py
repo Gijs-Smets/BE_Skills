@@ -159,3 +159,20 @@ def create_achievement(
     return {
         "message": "Achievement added successfully"
     }
+
+# all students: student_id and full name
+@app.get("/students")
+def get_all_students():
+    result = database.execute_sql_query(
+        qr.all_students
+    )
+
+    students = []
+
+    for row in result:
+        students.append({
+            "student_id": row[0],
+            "full_name": row[1]
+        })
+
+    return students
