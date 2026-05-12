@@ -1,13 +1,64 @@
-student_name_query = "SELECT * FROM project.student;"
+# how many achievements a specific student has
+student_award_count = """
+SELECT COUNT(*) AS achievement_count
+FROM project.award
+WHERE student_id = %s;
+"""
 
-teacher_name_query = "SELECT * FROM project.teacher;"
+# total number of achievements
+total_achievement_count = """
+SELECT COUNT(*) AS total_achievements
+FROM project.achievement;
+"""
 
-no_award_student = "SELECT s.* FROM project.student s LEFT JOIN project.award a ON s.student_id = a.student_id WHERE a.award_id IS NULL;"
+# which achievements a student has
+student_achievements = """
+SELECT a.achievement_id,
+       a.title,
+       a.requirement,
+       c.name AS category
+FROM project.award aw
+JOIN project.achievement a
+    ON aw.achievement_id = a.achievement_id
+JOIN project.category c
+    ON a.category_id = c.category_id
+WHERE aw.student_id = %s;
+"""
 
-award_student = "SELECT concat(s.firstname, ' ' , s.lastname) AS student, s.class, COUNT(a.award_id) AS total_awards FROM project.student s LEFT JOIN project.award a ON s.student_id = a.student_id GROUP BY s.student_id, s.firstname, s.lastname, s.class ORDER BY total_awards DESC;"
+# how many students there are
+student_count = """
+SELECT COUNT(*) AS total_students
+FROM project.student;
+"""
 
-award_teacher = "SELECT concat(t.firstname, ' ' , t.lastname) AS teacher, COUNT(a.award_id) AS awards_given FROM project.teacher t LEFT JOIN project.award a ON a.awarded_by = t.teacher_id GROUP BY t.teacher_id, t.firstname, t.lastname ORDER BY awards_given DESC;"
+# total number of awarded achievements
+total_awarded_achievements = """
+SELECT COUNT(*) AS total_awarded
+FROM project.award;
+"""
 
-award_class = "SELECT s.class, COUNT(a.award_id) AS total_awards FROM project.student s LEFT JOIN project.award a ON a.student_id = s.student_id GROUP BY s.class ORDER BY total_awards DESC;"
+# basic information about each achievement
+achievement_info = """
+SELECT a.achievement_id,
+       a.title,
+       a.requirement,
+       c.name AS category
+FROM project.achievement a
+JOIN project.category c
+    ON a.category_id = c.category_id
+ORDER BY a.achievement_id;
+"""
 
-not_award_achievement = "SELECT ac.title, ac.requirement, c.name AS category FROM project.achievement ac JOIN project.category c ON c.category_id = ac.category_id LEFT JOIN project.award a ON a.achievement_id = ac.achievement_id WHERE a.award_id IS NULL ORDER BY c.name, ac.title;"
+# award an achievement to a student
+award_achievement = """
+INSERT INTO project.award
+(award_id, student_id, achievement_id, awarded_by, date_awarded)
+VALUES (%s, %s, %s, %s, %s);
+"""
+
+# add new achievement
+add_achievement = """
+INSERT INTO project.achievement
+(achievement_id, title, requirement, category_id)
+VALUES (%s, %s, %s, %s);
+"""
