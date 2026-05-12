@@ -7,6 +7,7 @@ import {
     fetchAchievements,
     fetchAchievementCount,
     fetchStudentCount,
+    fetchStudents,
     fetchStudentAchievements,
     fetchStudentAchievementCount,
     fetchTotalAwardedCount,
@@ -27,14 +28,16 @@ let students = [];          // loaded from backend (student list via /students/a
 
 // Known student IDs — in a real system these would come from a /students endpoint.
 // For now we derive them from the login credentials defined in login.js.
-const KNOWN_STUDENT_IDS = [1, 2, 3, 4, 5];
-const STUDENT_NAMES = {
-    1: 'Anna de Vries',
-    2: 'Bob de Jong',
-    3: 'Celine Patel',
-    4: 'David Kim',
-    5: 'Emma Smits'
-};
+// const KNOWN_STUDENT_IDS = [1, 2, 3, 4, 5];
+// const STUDENT_NAMES = {
+//     1: 'Anna de Vries',
+//     2: 'Bob de Jong',
+//     3: 'Celine Patel',
+//     4: 'David Kim',
+//     5: 'Emma Smits'
+// };
+
+
 
 // ── Bootstrap ─────────────────────────────────────────────────────────────────
 
@@ -42,10 +45,12 @@ document.addEventListener('DOMContentLoaded', init);
 
 async function init() {
     try {
+        // Load achievements first so student percentage calculations are accurate
+        await loadAchievements();
+
         await Promise.all([
             loadDashboardStats(),
-            loadStudents(),
-            loadAchievements()
+            loadStudents()
         ]);
     } catch (err) {
         console.error('Init error:', err);
@@ -78,17 +83,28 @@ async function loadDashboardStats() {
 
 async function loadStudents() {
     try {
-        // Fetch achievement counts for every known student in parallel
+        // 1. Fetch the actual student list from the backend
+        const allStudents = await fetchStudents();
+
+        // 2. Fetch achievement counts for the actual students returned by the API
         const results = await Promise.all(
-            KNOWN_STUDENT_IDS.map(id =>
-                fetchStudentAchievementCount(id)
-                    .then(res => ({ id, done: res.achievement_count, name: STUDENT_NAMES[id] || `Student ${id}` }))
-                    .catch(() => ({ id, done: 0, name: STUDENT_NAMES[id] || `Student ${id}` }))
+            allStudents.map(student =>
+                fetchStudentAchievementCount(student.student_id)
+                    .then(res => ({
+                        id: student.student_id,
+                        name: student.full_name,
+                        done: res.achievement_count
+                    }))
+                    .catch(() => ({
+                        id: student.student_id,
+                        name: student.full_name,
+                        done: 0
+                    }))
             )
         );
 
-        // We don't have a total-achievements endpoint here, use achievements length
-        const totalAchs = achievementsData.length || 25;
+        // Calculate totals based on loaded achievementsData
+        const totalAchs = achievementsData.length || 0;
 
         students = results.map(r => {
             const pct = totalAchs > 0 ? Math.round((r.done / totalAchs) * 100) : 0;
@@ -96,7 +112,7 @@ async function loadStudents() {
                 id:       r.id,
                 name:     r.name,
                 done:     r.done,
-                progress: 0,    // extend when a progress endpoint is available
+                progress: 0,
                 total:    totalAchs,
                 pct,
                 level:    pct >= 80 ? 'Uitstekend' : pct >= 60 ? 'Gevorderd' : pct >= 40 ? 'Gemiddeld' : 'Beginner'

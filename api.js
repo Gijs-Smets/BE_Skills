@@ -48,6 +48,11 @@ export async function fetchStudentCount() {
     return apiFetch('/students/count');
 }
 
+/** GET /students — student information */
+export async function fetchStudents() {
+    return apiFetch('/students');
+}
+
 /**
  * GET /students/achievements — achievements earned by a student
  * @param {number} studentId
