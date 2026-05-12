@@ -224,64 +224,6 @@
         <p class="footer-note">ITF04 · Team 4 · Schooljaar 2025–26</p>
     </div>
 
-    <script>
-        const USERS = {
-            // — Studenten —
-            'student':       { password: 'student123', role: 'student', name: 'Demo Student'  },
-            'anna':          { password: 'anna123',    role: 'student', name: 'Anna de Vries' },
-            'bob':           { password: 'bob123',     role: 'student', name: 'Bob de Jong'   },
-            'celine':        { password: 'celine123',  role: 'student', name: 'Celine Patel'  },
-            'david':         { password: 'david123',   role: 'student', name: 'David Kim'     },
-            'emma':          { password: 'emma123',    role: 'student', name: 'Emma Smits'    },
-
-            // — Leerkrachten —
-            'leerkracht':    { password: 'teacher123', role: 'teacher', name: 'Demo Leerkracht' },
-            'teacher':       { password: 'teacher123', role: 'teacher', name: 'Demo Leerkracht' },
-            'mevr.jansen':   { password: 'jansen123',  role: 'teacher', name: 'Mevr. Jansen'    },
-            'dhr.peters':    { password: 'peters123',  role: 'teacher', name: 'Dhr. Peters'     }
-        };
-
-        const PAGE_BY_ROLE = { 'student': 'achievements.html', 'teacher': 'teacher.html' };
-
-        function togglePassword() {
-            const input = document.getElementById('password');
-            input.type = input.type === 'password' ? 'text' : 'password';
-        }
-
-        function doLogin(event) {
-            if (event) event.preventDefault();
-            const username = document.getElementById('username').value.trim().toLowerCase();
-            const password = document.getElementById('password').value;
-            const errorEl  = document.getElementById('error-msg');
-            const btn      = document.getElementById('login-btn');
-            errorEl.style.display = 'none';
-
-            if (!username || !password) {
-                errorEl.textContent = '❌ Vul zowel gebruikersnaam als wachtwoord in.';
-                errorEl.style.display = 'block';
-                return;
-            }
-            const user = USERS[username];
-            if (!user || user.password !== password) {
-                errorEl.textContent = '❌ Ongeldige gebruikersnaam of wachtwoord.';
-                errorEl.style.display = 'block';
-                document.getElementById('password').value = '';
-                document.getElementById('password').focus();
-                return;
-            }
-            const targetPage = PAGE_BY_ROLE[user.role];
-            if (!targetPage) {
-                errorEl.textContent = '❌ Account heeft geen geldige rol toegewezen.';
-                errorEl.style.display = 'block';
-                return;
-            }
-            localStorage.setItem('unlockd_user', JSON.stringify({
-                username, role: user.role, name: user.name, loginAt: new Date().toISOString()
-            }));
-            btn.disabled = true;
-            btn.textContent = '✓ Inloggen...';
-            setTimeout(() => window.location.replace(targetPage), 250);
-        }
-    </script>
+    <script src="login.js"></script>
 </body>
 </html>
