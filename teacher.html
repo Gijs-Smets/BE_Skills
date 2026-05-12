@@ -170,8 +170,8 @@
 
             <div class="stats-row">
                 <div class="stat-card"><div class="stat-icon-wrap blue">👥</div><div class="stat-info"><span class="stat-num" id="stat-students">5</span><span class="stat-lbl">Studenten</span></div></div>
-                <div class="stat-card"><div class="stat-icon-wrap green">✅</div><div class="stat-info"><span class="stat-num">156</span><span class="stat-lbl">Behaald (totaal)</span></div></div>
-                <div class="stat-card"><div class="stat-icon-wrap purple">📊</div><div class="stat-info"><span class="stat-num">68%</span><span class="stat-lbl">Gem. Voortgang</span></div></div>
+                <div class="stat-card"><div class="stat-icon-wrap green">✅</div><div class="stat-info"><span class="stat-num" id="stat-awarded">156</span><span class="stat-lbl">Behaald (totaal)</span></div></div>
+                <div class="stat-card"><div class="stat-icon-wrap purple">📊</div><div class="stat-info"><span class="stat-num" id="stat-achievements">25</span><span class="stat-lbl">Achievements</span></div></div>
                 <div class="stat-card"><div class="stat-icon-wrap amber">⭐</div><div class="stat-info"><span class="stat-num">2</span><span class="stat-lbl">Legends</span></div></div>
             </div>
 
@@ -245,15 +245,11 @@
                 <div class="form-group"><label>Student</label>
                     <select class="form-select" id="grant-student">
                         <option value="">-- Selecteer student --</option>
-                        <option>Anna de Vries</option><option>Bob de Jong</option><option>Celine Patel</option>
-                        <option>David Kim</option><option>Emma Smits</option>
                     </select>
                 </div>
                 <div class="form-group"><label>Achievement</label>
                     <select class="form-select" id="grant-achievement">
                         <option value="">-- Selecteer achievement --</option>
-                        <option>De Doorzetter</option><option>Topscore</option><option>Growth Mindset Hero</option>
-                        <option>De Comeback Kid</option><option>De Legende</option><option>Teamplayer</option><option>Respect Master</option>
                     </select>
                 </div>
                 <div class="form-group"><label>Opmerking (optioneel)</label>
@@ -290,7 +286,7 @@
             </div>
             <div class="modal-footer">
                 <button class="btn-secondary" onclick="closeModal('new-achievement-modal')">Annuleren</button>
-                <button class="btn-primary"   onclick="createAchievement(event)">➕ Aanmaken</button>
+                <button class="btn-primary"   onclick="createAchievementHandler(event)">➕ Aanmaken</button>
             </div>
         </div>
     </div>
@@ -317,250 +313,6 @@
         </div>
     </div>
 
-    <script>
-        const currentUser = JSON.parse(localStorage.getItem('unlockd_user') || '{}');
-        document.getElementById('nav-user').textContent = '👩‍🏫 ' + currentUser.name;
-
-        const students = [
-            { id: 's1', name: 'Anna de Vries',  done: 8,  progress: 3, total: 25, pct: 65, level: 'Gevorderd' },
-            { id: 's2', name: 'Bob de Jong',     done: 5,  progress: 4, total: 25, pct: 45, level: 'Gemiddeld' },
-            { id: 's3', name: 'Celine Patel',    done: 12, progress: 2, total: 25, pct: 85, level: 'Uitstekend' },
-            { id: 's4', name: 'David Kim',       done: 3,  progress: 5, total: 25, pct: 35, level: 'Beginner' },
-            { id: 's5', name: 'Emma Smits',      done: 10, progress: 1, total: 25, pct: 75, level: 'Gevorderd' }
-        ];
-
-        let achievementsData = [
-            { id: 1,  title: 'De Doorzetter',       icon: '📈', desc: '3 toetsen op rij verbeterd',          cat: '📚 Academisch'          },
-            { id: 2,  title: 'Topscore',             icon: '🎯', desc: '90% of hoger op een toets',           cat: '📚 Academisch'          },
-            { id: 3,  title: 'Constante Kracht',     icon: '💪', desc: '5 toetsen op rij boven 75%',          cat: '📚 Academisch'          },
-            { id: 4,  title: 'Deadline Master',      icon: '⏰', desc: '10 opdrachten op tijd',               cat: '📚 Academisch'          },
-            { id: 5,  title: 'Perfecte Planning',    icon: '📅', desc: 'Maand lang alles op tijd',            cat: '📚 Academisch'          },
-            { id: 6,  title: 'De Studiekrijger',     icon: '📖', desc: '10 uur extra zelfstudie',             cat: '📚 Academisch'          },
-            { id: 7,  title: 'De Vakexpert',         icon: '🏅', desc: 'Beste score van de klas',             cat: '📚 Academisch'          },
-            { id: 8,  title: 'De Volhouder',         icon: '🛡️', desc: 'Geen opdracht gemist',               cat: '📚 Academisch'          },
-            { id: 9,  title: 'De Slimme Strategie',  icon: '🧠', desc: 'Verbetering met methode',             cat: '📚 Academisch'          },
-            { id: 10, title: 'Growth Mindset Hero',  icon: '💎', desc: 'Feedback gevraagd',                   cat: '💡 Groei & Mindset'    },
-            { id: 11, title: 'Foutenmaker',          icon: '😅', desc: 'Fout gedeeld',                        cat: '💡 Groei & Mindset'    },
-            { id: 12, title: 'De Nieuwsgierige',     icon: '🔍', desc: '5 lessen vragen',                     cat: '💡 Groei & Mindset'    },
-            { id: 13, title: 'Stap Voor Stap',       icon: '🪜', desc: 'Consistente voortgang',               cat: '💡 Groei & Mindset'    },
-            { id: 14, title: 'Comfortzone Crusher',  icon: '🚀', desc: 'Buiten je zone',                      cat: '💡 Groei & Mindset'    },
-            { id: 15, title: 'Teamplayer',           icon: '🤝', desc: 'Groepsproject bijdrage',              cat: '🤝 Samenwerking'       },
-            { id: 16, title: 'De Helper',            icon: '🙋', desc: 'Klasgenoot geholpen',                 cat: '🤝 Samenwerking'       },
-            { id: 17, title: 'Respect Master',       icon: '🫡', desc: 'Zonder waarschuwingen',               cat: '🤝 Samenwerking'       },
-            { id: 18, title: 'De Bruggenbouwer',     icon: '🌉', desc: 'Conflicten oplossen',                 cat: '🤝 Samenwerking'       },
-            { id: 19, title: 'Actieve Deelnemer',    icon: '✋', desc: 'Regelmatig deelnemen',                cat: '🤝 Samenwerking'       },
-            { id: 20, title: 'De Aanwezige',         icon: '📋', desc: 'Perfecte aanwezigheid',               cat: '🏫 Schoolbetrokkenheid'},
-            { id: 21, title: 'Punctuality Pro',      icon: '⌚', desc: 'Altijd op tijd',                      cat: '🏫 Schoolbetrokkenheid'},
-            { id: 22, title: 'De Vertegenwoordiger', icon: '🗳️', desc: 'Leerlingenraad',                     cat: '🏫 Schoolbetrokkenheid'},
-            { id: 23, title: 'De Comeback Kid',      icon: '🔥', desc: 'Sterke verbetering',                  cat: '⭐ Speciaal'           },
-            { id: 24, title: 'De Alleskunner',       icon: '🌟', desc: 'Goed in meerdere vakken',             cat: '⭐ Speciaal'           },
-            { id: 25, title: 'De Legende',           icon: '👑', desc: 'Uitzonderlijke prestatie',            cat: '⭐ Speciaal'           }
-        ];
-
-        function switchTab(name, el) {
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-            el.classList.add('active');
-            document.getElementById('tab-' + name).classList.add('active');
-        }
-
-        function renderStudentTable() {
-            const tbody = document.getElementById('student-tbody');
-            tbody.innerHTML = students.map(s => {
-                const levelColor = s.pct >= 80 ? '#10B981' : s.pct >= 60 ? '#F59E0B' : '#EF4444';
-                return `
-                <tr data-name="${s.name.toLowerCase()}">
-                    <td><strong>${s.name}</strong></td>
-                    <td><span style="font-size:0.75rem;font-weight:800;background:rgba(167,139,250,0.12);color:var(--brand-dark);padding:3px 8px;border-radius:99px;">ITF04</span></td>
-                    <td><strong style="color:var(--green)">${s.done}</strong></td>
-                    <td><strong style="color:var(--brand)">${s.progress}</strong></td>
-                    <td style="min-width: 140px;">
-                        <div style="display:flex;align-items:center;gap:8px;">
-                            <div class="progress-bar" style="flex:1"><div class="progress-fill" style="width:${s.pct}%"></div></div>
-                            <span style="font-size:0.8rem;font-weight:800;color:var(--slate);min-width:32px;">${s.pct}%</span>
-                        </div>
-                    </td>
-                    <td><span style="font-size:0.75rem;font-weight:800;color:white;background:${levelColor};padding:4px 10px;border-radius:99px;">${s.level}</span></td>
-                    <td>
-                        <div style="display:flex;gap:6px;">
-                            <button class="btn-action" onclick="viewStudentDetail('${s.id}')">👁️ Detail</button>
-                            <button class="btn-action" onclick="openGrantForStudent('${s.name}')">🏆 Award</button>
-                        </div>
-                    </td>
-                </tr>`;
-            }).join('');
-            const sel = document.getElementById('student-select');
-            sel.innerHTML = '<option value="">-- Selecteer een student --</option>' +
-                students.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
-        }
-
-        function filterStudentRows() {
-            const q = document.getElementById('search-student').value.toLowerCase();
-            document.querySelectorAll('#student-tbody tr').forEach(row => {
-                row.style.display = (!q || row.dataset.name.includes(q)) ? '' : 'none';
-            });
-        }
-
-        function viewStudentDetail(id) {
-            switchTab('students', document.querySelectorAll('.tab-btn')[1]);
-            document.getElementById('student-select').value = id;
-            loadStudentDetail(id);
-        }
-
-        function openGrantForStudent(name) {
-            openModal('grant-modal');
-            document.getElementById('grant-student').value = name;
-        }
-
-        function loadStudentDetail(id) {
-            const area = document.getElementById('student-detail-area');
-            if (!id) {
-                area.innerHTML = `<div style="text-align:center;padding:60px 20px;color:var(--slate-lighter);font-weight:700;"><div style="font-size:3rem;margin-bottom:12px;">👆</div>Selecteer een student om details te bekijken</div>`;
-                return;
-            }
-            const s = students.find(x => x.id === id);
-            if (!s) return;
-            const locked = s.total - s.done - s.progress;
-            area.innerHTML = `
-                <div class="student-detail-panel">
-                    <div class="detail-header">
-                        <div class="student-avatar">${s.name[0]}</div>
-                        <div>
-                            <h2 style="font-size:1.5rem;font-weight:900;color:var(--slate)">${s.name}</h2>
-                            <p style="color:var(--slate-lighter);font-weight:700;font-size:0.875rem;">Klas ITF04 · Schooljaar 2025–26</p>
-                        </div>
-                        <div style="margin-left:auto;display:flex;gap:10px;flex-wrap:wrap;">
-                            <button class="btn-primary" onclick="openGrantForStudent('${s.name}')">🏆 Award Geven</button>
-                        </div>
-                    </div>
-                    <div class="detail-grid">
-                        <div class="mini-stat"><span class="mini-stat-icon">✅</span><div><span class="mini-stat-num">${s.done}</span><span class="mini-stat-lbl">Behaald</span></div></div>
-                        <div class="mini-stat"><span class="mini-stat-icon">🔄</span><div><span class="mini-stat-num">${s.progress}</span><span class="mini-stat-lbl">Bezig</span></div></div>
-                        <div class="mini-stat"><span class="mini-stat-icon">🔒</span><div><span class="mini-stat-num">${locked}</span><span class="mini-stat-lbl">Vergrendeld</span></div></div>
-                        <div class="mini-stat"><span class="mini-stat-icon">📈</span><div><span class="mini-stat-num">${s.pct}%</span><span class="mini-stat-lbl">Voortgang</span></div></div>
-                    </div>
-                </div>`;
-        }
-
-        function renderAchievementEditor() {
-            const grid = document.getElementById('ach-editor-grid');
-            grid.innerHTML = achievementsData.map(a => `
-                <div class="ach-edit-card">
-                    <span style="font-size:1.8rem;">${a.icon}</span>
-                    <div class="ach-edit-info">
-                        <span class="ach-edit-cat">${a.cat}</span>
-                        <h4>${a.title}</h4>
-                        <p>${a.desc}</p>
-                    </div>
-                    <div style="display:flex;gap:6px;flex-shrink:0;">
-                        <button class="btn-tiny" onclick="openEditModal(${a.id})" title="Bewerken">✏️</button>
-                    </div>
-                </div>`).join('');
-        }
-
-        function confirmGrant(event) {
-            event.preventDefault();
-            const student = document.getElementById('grant-student').value;
-            const ach     = document.getElementById('grant-achievement').value;
-            if (!student || !ach) { alert('❌ Selecteer een student en achievement.'); return; }
-            alert(`🎉 Achievement "${ach}" succesvol toegekend aan ${student}!`);
-            closeModal('grant-modal');
-        }
-
-        function logout(event) {
-            if (event) event.preventDefault();
-            if (confirm('⚠️ Weet je zeker dat je wilt uitloggen?')) {
-                localStorage.removeItem('unlockd_user');
-                localStorage.removeItem('unlockd_teacher_preview');
-                window.location.replace('login.html');
-            }
-        }
-
-        function toggleUserMenu() { document.getElementById('user-dropdown').classList.toggle('active'); }
-        document.addEventListener('click', e => {
-            if (!e.target.closest('.nav-menu')) {
-                document.getElementById('user-dropdown').classList.remove('active');
-            }
-        });
-
-        function viewAsStudent(event) {
-            if (event) event.preventDefault();
-            localStorage.setItem('unlockd_teacher_preview', '1');
-            window.location.href = 'achievements.html';
-        }
-
-        function openTeacherProfile(event) {
-            if (event) event.preventDefault();
-            alert('👤 Profiel\n\nNaam: ' + (currentUser.name || '-') +
-                  '\nGebruikersnaam: ' + (currentUser.username || '-') +
-                  '\nRol: Leerkracht\nKlas: ITF04');
-            toggleUserMenu();
-        }
-        function showHelp(event) {
-            if (event) event.preventDefault();
-            alert('📖 Leerkracht Help\n\n• Award Toekennen: ken een achievement toe aan een student.\n• Nieuw Achievement: maak een nieuw doel aan voor de klas.\n• Bekijk als Student: zie hoe het dashboard er voor studenten uitziet.\n\nVragen? support@unlockd.nl');
-            toggleUserMenu();
-        }
-        function exportAll(event) {
-            if (event) event.preventDefault();
-            alert('📊 Exporteren\n\nAlle voortgangsdata van de klas wordt geëxporteerd (demo).');
-            toggleUserMenu();
-        }
-        function openEditModal(id) {
-            const a = achievementsData.find(x => x.id === id);
-            if (!a) return;
-            document.getElementById('edit-id').value    = a.id;
-            document.getElementById('edit-name').value  = a.title;
-            document.getElementById('edit-emoji').value = a.icon;
-            document.getElementById('edit-desc').value  = a.desc;
-            document.getElementById('edit-cat').value   = a.cat;
-            openModal('edit-modal');
-        }
-        function saveEdit(event) {
-            event.preventDefault();
-            const id = parseInt(document.getElementById('edit-id').value);
-            const a = achievementsData.find(x => x.id === id);
-            if (!a) return;
-            a.title = document.getElementById('edit-name').value  || a.title;
-            a.icon  = document.getElementById('edit-emoji').value || a.icon;
-            a.desc  = document.getElementById('edit-desc').value  || a.desc;
-            a.cat   = document.getElementById('edit-cat').value   || a.cat;
-            renderAchievementEditor();
-            closeModal('edit-modal');
-            alert('💾 Achievement opgeslagen!');
-        }
-        function createAchievement(event) {
-            event.preventDefault();
-            const name  = document.getElementById('new-name').value.trim();
-            const emoji = document.getElementById('new-emoji').value.trim() || '⭐';
-            const desc  = document.getElementById('new-desc').value.trim();
-            const cat   = document.getElementById('new-cat').value;
-            if (!name || !desc) { alert('❌ Vul minstens een naam en beschrijving in.'); return; }
-            const newId = Math.max(...achievementsData.map(a => a.id)) + 1;
-            achievementsData.push({ id: newId, title: name, icon: emoji, desc, cat });
-            renderAchievementEditor();
-            closeModal('new-achievement-modal');
-            ['new-name','new-emoji','new-desc'].forEach(id => document.getElementById(id).value = '');
-            alert('🎉 Nieuw achievement aangemaakt: ' + name);
-        }
-
-        function openModal(id) {
-            document.getElementById('modal-overlay').style.display = 'block';
-            document.getElementById(id).style.display = 'flex';
-        }
-        function closeModal(id) {
-            document.getElementById(id).style.display = 'none';
-            document.getElementById('modal-overlay').style.display = 'none';
-        }
-        function closeAllModals() {
-            document.querySelectorAll('.modal').forEach(m => m.style.display = 'none');
-            document.getElementById('modal-overlay').style.display = 'none';
-        }
-
-        document.addEventListener('DOMContentLoaded', () => {
-            renderStudentTable();
-            renderAchievementEditor();
-        });
-    </script>
+    <script type="module" src="teacher.js"></script>
 </body>
 </html>
